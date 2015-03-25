@@ -29,5 +29,6 @@ void MainWindow::on_Run_clicked()
         //input_ = theParser.parse();
         theParser.parse(input_);
         ui->program->addItems(input_);
+
     //}
 }

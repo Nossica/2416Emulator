@@ -7,12 +7,19 @@
 class Parser
 {
     QString fileName_;
+
+
+    bool validateLine(QString& line);
+    bool validateBinary(QString& line);
+    bool validateHex(QString& line);
 public:
-    Parser(const QString& fileName):fileName_(fileName)
+    Parser(const QString& fileName)
+        : fileName_(fileName)
         {};
 
     //
     void parse(QList<QString>& input);
+
 };
 
 #endif // PARSER_HPP
