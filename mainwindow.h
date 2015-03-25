@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QList>
+#include <QString>
 
 namespace Ui {
 class MainWindow;
@@ -23,6 +25,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QString fileName_;
+    QList<QString> input_;
 };
 
 #endif // MAINWINDOW_H

@@ -1,10 +1,6 @@
 #include <QtGui/QApplication>
 #include "mainwindow.h"
 
-class Parser {
-public:
-
-};
 
 int main(int argc, char *argv[])
 {

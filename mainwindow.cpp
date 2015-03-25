@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QFileDialog>
-
+#include <parser.hpp>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -19,13 +19,15 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_clicked()
 {
     fileName_ = QFileDialog::getOpenFileName(this,
-        tr("Open input file"), "", tr("2416 Files (*.myk)"));
-
+        tr("Open input file"), "", tr("2416E Files (*.vnp)"));
 }
 
 void MainWindow::on_Run_clicked()
 {
-    if (fileName_) {
-        // parse file here
-    }
+    //if (fileName_.) {
+        Parser theParser(fileName_);
+        //input_ = theParser.parse();
+        theParser.parse(input_);
+        ui->program->addItems(input_);
+    //}
 }
