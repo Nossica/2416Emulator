@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     fileName_.clear();
+    RAM_.fill(false, 32767);
 }
 
 MainWindow::~MainWindow()
@@ -20,15 +21,16 @@ void MainWindow::on_pushButton_clicked()
 {
     fileName_ = QFileDialog::getOpenFileName(this,
         tr("Open input file"), "", tr("2416E Files (*.vnp)"));
-}
 
-void MainWindow::on_Run_clicked()
-{
-    //if (fileName_.) {
+    if (fileName_.isEmpty() == false) {
         Parser theParser(fileName_);
         //input_ = theParser.parse();
         theParser.parse(input_);
         ui->program->addItems(input_);
+    }
+}
 
-    //}
+void MainWindow::on_Run_clicked()
+{
+
 }

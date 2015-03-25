@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QList>
 #include <QString>
+#include <QMap>
 
 namespace Ui {
 class MainWindow;
@@ -25,7 +26,11 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QString fileName_;
+
     QList<QString> input_;
+    QVector<bool> RAM_;
+    QMap<QString, unsigned int> registers_;
+
 };
 
 #endif // MAINWINDOW_H
