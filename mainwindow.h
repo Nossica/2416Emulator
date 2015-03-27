@@ -23,6 +23,11 @@ private slots:
 
     void on_Run_clicked();
 
+    void updateALU();
+    void updateACC();
+    void updateZero();
+    void updateCarry();
+
 private:
     Ui::MainWindow *ui;
     QString fileName_;
@@ -30,7 +35,7 @@ private:
     QList<QString> input_;
     QVector<bool> RAM_;
     QMap<QString, unsigned int> registers_;
-
+    QMap<QString, bool> flags_;
 };
 
 #endif // MAINWINDOW_H
