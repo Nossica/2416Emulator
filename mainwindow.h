@@ -6,6 +6,8 @@
 #include <QString>
 #include <QMap>
 
+class Instruction;
+
 namespace Ui {
 class MainWindow;
 }
@@ -36,6 +38,9 @@ private:
     QVector<bool> RAM_;
     QMap<QString, unsigned int> registers_;
     QMap<QString, bool> flags_;
+    QMap<int, Instruction*> instructions_;
+
+    Instruction* factory(int index);
 };
 
 #endif // MAINWINDOW_H

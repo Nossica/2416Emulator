@@ -16,7 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ACC, SIGNAL(textChanged()), this, SLOT(updateACC()));
     connect(ui->Carry, SIGNAL(textChanged()), this, SLOT(updateCarry()));
     connect(ui->Zero, SIGNAL(textChanged()), this, SLOT(updateZero()));
-
 }
 
 MainWindow::~MainWindow()
@@ -32,13 +31,25 @@ void MainWindow::on_pushButton_clicked()
     if (fileName_.isEmpty() == false) {
         Parser theParser(fileName_);
         //input_ = theParser.parse();
-        theParser.parse(input_);
-        ui->program->addItems(input_);
+        int index = 0;
+        do {
+            int instruction, parameter;
+            QString theString;
+            if (theParser.parse(instruction, parameter)) {
+
+            }
+
+
+        }
+        while (index >= 0);
+
+        //theParser.parse(input_);
+        //ui->program->addItems(input_);
     }
 }
 
-void MainWindow::on_Run_clicked()
-{
+void MainWindow::on_Run_clicked() {
+    //for (auto it = )
     registers_["ACC"] = 1;
 }
 
@@ -56,4 +67,19 @@ void MainWindow::updateZero() {
 
 void MainWindow::updateCarry() {
     flags_["Carry"] = ui->ALU->toPlainText().toInt(0,2);
+}
+
+Instruction* MainWindow::factory(int index) {
+    return NULL;
+    //    switch (index){
+//        default:
+//        return nullptr;
+
+//    case (00x):
+//        return new JMP(registers_, flags_, RAM_);
+//    case (0Ex):
+//        return new JPC(registers_, flags_, RAM_);
+
+
+//    }
 }

@@ -1,7 +1,4 @@
 #include "parser.hpp"
-#include <QFile>
-#include <QMessageBox>
-#include <QTextStream>
 
 void Parser::parse(QList<QString>& input) {
     QFile file(fileName_);
@@ -13,20 +10,37 @@ void Parser::parse(QList<QString>& input) {
 
     QTextStream in(&file);
     int lineNumber = 0;
-    while(!in.atEnd()) {
-        inputLine = in.readLine();
-        if (validateLine(inputLine)) {
-            if (inputLine.length()) {
-                inputLine.replace('_',' ');
-                input.append(inputLine);
-            }
-        }
-    }
+//    while(!in.atEnd()) {
+//        inputLine = in.readLine();
+//        if (validateLine(inputLine)) {
+//            if (inputLine.length()) {
+//                inputLine.replace('_',' ');
+//                input.append(inputLine);
+//            }
+//        }
+//    }
 
     file.close();
 }
 
-bool Parser::validateLine(QString& line) {
+bool Parser::parse(int& instruction, int& parameter) {
+    if (in_->atEnd())
+        return false;
+
+    QString inputLine = in_->readLine();
+    if (validateLine(inputLine, instruction, parameter)) {
+        if (inputLine.length()) {
+            QString a = inputLine.left(inputLine.indexOf('_'));
+            instruction = a.toInt(0,16);
+            QString b = inputLine.right(inputLine.length() - 1 - inputLine.indexOf('_'));
+            parameter = b.toInt(0,16);
+        }
+    }
+
+    return true;
+}
+
+bool Parser::validateLine(QString& line, int& instruction, int& parameter) {
     // remove white space
     line = line.simplified();
     line.replace( " ", "" );
@@ -42,14 +56,14 @@ bool Parser::validateLine(QString& line) {
         return true;
     case 41:
         // Binary entry
-        return validateBinary(line);
+        return validateBinary(line, instruction, parameter);
     case 11:
         // Hex entry
-        return validateHex(line);
+        return validateHex(line, instruction, parameter);
     }
 }
 
-bool Parser::validateBinary(QString& line) {
+bool Parser::validateBinary(QString& line, int& instruction, int& parameter) {
     // check whether there is a separator
     if (line.indexOf('_') == -1)
         return false;
@@ -59,7 +73,6 @@ bool Parser::validateBinary(QString& line) {
 
     QString address = line.section('_',0,0);
     QString data = line.section('_',1,1);
-
 
     if((address.length() != 16) || (data.length() != 24))
         return false;
@@ -77,7 +90,7 @@ bool Parser::validateBinary(QString& line) {
     return true;
 }
 
-bool Parser::validateHex(QString& line) {
+bool Parser::validateHex(QString& line, int& instruction, int& parameter) {
     // check whether there is a separator
     if (line.indexOf('_') == -1)
         return false;
@@ -92,7 +105,7 @@ bool Parser::validateHex(QString& line) {
     // check whether the hex numbers are correctly formed
     bool ok;
 
-    address.toUInt(&ok, 16);
+    int i = address.toUInt(&ok, 16);
     if (!ok) {
         return false;
     }
