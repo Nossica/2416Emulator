@@ -7,15 +7,23 @@
 #include <QMessageBox>
 #include <QTextStream>
 
+enum PARSE_STATE {
+    PARSE_STATE_BEGIN,
+    FILE_END,
+    VALID_FIELD,
+    INVALID_FIELD,
+    PARSE_STATE_END
+};
+
 class Parser
 {
     QString fileName_;
     QFile* file_;
     QTextStream *in_;
 
-    bool validateLine(QString& line, int& instruction, int& parameter);
-    bool validateBinary(QString& line, int& instruction, int& parameter);
-    bool validateHex(QString& line, int& instruction, int& parameter);
+    PARSE_STATE validateLine(QString& line, int& instruction, int& parameter);
+    PARSE_STATE validateBinary(QString& line, int& instruction, int& parameter);
+    PARSE_STATE validateHex(QString& line, int& instruction, int& parameter);
 public:
     Parser(const QString& fileName)
         : fileName_(fileName)
@@ -37,7 +45,7 @@ public:
 
     //
     void parse(QList<QString>& input);
-    bool parse(int& instruction, int& parameter);
+    PARSE_STATE parse(int& instruction, int& parameter);
 
 };
 

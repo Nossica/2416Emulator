@@ -10,20 +10,21 @@ class Instruction
 private:
     QString name_;
 protected:
+    int parameter_;
     QMap<QString, unsigned int> registers_;
     QMap<QString, bool> flags_;
     QVector<bool> RAM_;
 
 public:
-    Instruction(const QString& name, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM);
+    Instruction(const QString& name, const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM);
 
     virtual bool execute(unsigned int input = 0) = 0;
 };
 
 class JMP : public Instruction {
 public:
-    JMP(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("JMP", registers, flags, RAM)
+    JMP(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("JMP", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -35,8 +36,8 @@ public:
 
 class JPC : public Instruction {
 public:
-    JPC(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("JPC", registers, flags, RAM)
+    JPC(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("JPC", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -48,8 +49,8 @@ public:
 
 class JPZ : public Instruction {
 public:
-    JPZ(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("JPZ", registers, flags, RAM)
+    JPZ(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("JPZ", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -61,8 +62,8 @@ public:
 
 class JNC : public Instruction {
 public:
-    JNC(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("JNC", registers, flags, RAM)
+    JNC(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("JNC", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -74,8 +75,8 @@ public:
 
 class JNZ : public Instruction {
 public:
-    JNZ(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("JNZ", registers, flags, RAM)
+    JNZ(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("JNZ", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -87,8 +88,8 @@ public:
 
 class JPE : public Instruction {
 public:
-    JPE(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("JPE", registers, flags, RAM)
+    JPE(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("JPE", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -100,8 +101,8 @@ public:
 
 class NOP : public Instruction {
 public:
-    NOP(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("NOP", registers, flags, RAM)
+    NOP(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("NOP", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -113,8 +114,8 @@ public:
 
 class DO : public Instruction {
 public:
-    DO(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("DO", registers, flags, RAM)
+    DO(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("DO", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -127,8 +128,8 @@ public:
 // Decrement accumulator
 class DEC : public Instruction {
 public:
-    DEC(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("DEC", registers, flags, RAM)
+    DEC(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("DEC", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -141,8 +142,8 @@ public:
 
 class SUC : public Instruction {
 public:
-    SUC(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("SUC", registers, flags, RAM)
+    SUC(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("SUC", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -154,8 +155,8 @@ public:
 
 class ADD : public Instruction {
 public:
-    ADD(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("ADD", registers, flags, RAM)
+    ADD(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("ADD", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -167,8 +168,8 @@ public:
 
 class ASL : public Instruction {
 public:
-    ASL(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("ASL", registers, flags, RAM)
+    ASL(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("ASL", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -180,8 +181,8 @@ public:
 
 class NOF : public Instruction {
 public:
-    NOF(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("NOF", registers, flags, RAM)
+    NOF(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("NOF", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -193,8 +194,8 @@ public:
 
 class INV : public Instruction {
 public:
-    INV(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("INV", registers, flags, RAM)
+    INV(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("INV", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -206,8 +207,8 @@ public:
 
 class NAN : public Instruction {
 public:
-    NAN(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("NAN", registers, flags, RAM)
+    NAN(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("NAN", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -219,8 +220,8 @@ public:
 
 class SET : public Instruction {
 public:
-    SET(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("SET", registers, flags, RAM)
+    SET(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("SET", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -232,8 +233,8 @@ public:
 
 class LDC : public Instruction {
 public:
-    LDC(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("LDC", registers, flags, RAM)
+    LDC(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("LDC", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -245,8 +246,8 @@ public:
 
 class XOR : public Instruction {
 public:
-    XOR(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("XOR", registers, flags, RAM)
+    XOR(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("XOR", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -259,8 +260,8 @@ public:
 // Load accumulator
 class LDA : public Instruction {
 public:
-    LDA(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("LDA", registers, flags, RAM)
+    LDA(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("LDA", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -271,8 +272,8 @@ public:
 
 class IOR : public Instruction {
 public:
-    IOR(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("IOR", registers, flags, RAM)
+    IOR(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("IOR", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -282,8 +283,8 @@ public:
 
 class CLR : public Instruction {
 public:
-    CLR(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("CLR", registers, flags, RAM)
+    CLR(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("CLR", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -293,8 +294,8 @@ public:
 
 class AND : public Instruction {
 public:
-    AND(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("AND", registers, flags, RAM)
+    AND(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("AND", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -304,8 +305,8 @@ public:
 
 class SUB : public Instruction {
 public:
-    SUB(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("SUB", registers, flags, RAM)
+    SUB(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("SUB", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -315,8 +316,8 @@ public:
 
 class ADI : public Instruction {
 public:
-    ADI(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("ADI", registers, flags, RAM)
+    ADI(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("ADI", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -326,8 +327,8 @@ public:
 
 class SFI : public Instruction {
 public:
-    SFI(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("SFI", registers, flags, RAM)
+    SFI(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("SFI", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -337,8 +338,8 @@ public:
 
 class INC : public Instruction {
 public:
-    INC(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("INC", registers, flags, RAM)
+    INC(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("INC", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {
@@ -349,8 +350,8 @@ public:
 // Store accumulator
 class STA : public Instruction {
 public:
-    STA(QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
-        Instruction("STA", registers, flags, RAM)
+    STA(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, QVector<bool>& RAM) :
+        Instruction("STA", parameter, registers, flags, RAM)
     {}
 
     virtual bool execute(unsigned int input = 0) {

@@ -40,7 +40,7 @@ private:
     QMap<QString, bool> flags_;
     QMap<int, Instruction*> instructions_;
 
-    Instruction* factory(int index);
+    Instruction* factory(int index, int parameter);
 };
 
 #endif // MAINWINDOW_H

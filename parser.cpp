@@ -23,24 +23,27 @@ void Parser::parse(QList<QString>& input) {
     file.close();
 }
 
-bool Parser::parse(int& instruction, int& parameter) {
+PARSE_STATE Parser::parse(int& instruction, int& parameter) {
     if (in_->atEnd())
-        return false;
+        return FILE_END;
 
     QString inputLine = in_->readLine();
-    if (validateLine(inputLine, instruction, parameter)) {
+    return validateLine(inputLine, instruction, parameter);
+
+  /*  if (INVALID_FIELD == validateLine(inputLine, instruction, parameter)) {
         if (inputLine.length()) {
             QString a = inputLine.left(inputLine.indexOf('_'));
             instruction = a.toInt(0,16);
             QString b = inputLine.right(inputLine.length() - 1 - inputLine.indexOf('_'));
             parameter = b.toInt(0,16);
+            return VALID_FIELD;
         }
     }
 
-    return true;
+    return INVALID_FIELD;*/
 }
 
-bool Parser::validateLine(QString& line, int& instruction, int& parameter) {
+PARSE_STATE Parser::validateLine(QString& line, int& instruction, int& parameter) {
     // remove white space
     line = line.simplified();
     line.replace( " ", "" );
@@ -50,10 +53,10 @@ bool Parser::validateLine(QString& line, int& instruction, int& parameter) {
     switch(line.length()) {
     default:
         // malformed statement
-        return false;
+        return INVALID_FIELD;
     case 0:
         // empty line or a pure comment
-        return true;
+        return INVALID_FIELD;
     case 41:
         // Binary entry
         return validateBinary(line, instruction, parameter);
@@ -63,57 +66,51 @@ bool Parser::validateLine(QString& line, int& instruction, int& parameter) {
     }
 }
 
-bool Parser::validateBinary(QString& line, int& instruction, int& parameter) {
+PARSE_STATE Parser::validateBinary(QString& line, int& instruction, int& parameter) {
     // check whether there is a separator
     if (line.indexOf('_') == -1)
-        return false;
+        return INVALID_FIELD;
 
-    //QString address = line.left(line.indexOf('_'));
-    //QString data = line.right(line.indexOf('_'));
-
-    QString address = line.section('_',0,0);
-    QString data = line.section('_',1,1);
+    QStringList myStringList = line.split("_");
+    QString address = myStringList.at(0);
+    QString data = myStringList.at(1);
 
     if((address.length() != 16) || (data.length() != 24))
-        return false;
+        return INVALID_FIELD;
 
-    address = address.remove('0');
-    address = address.remove('1');
-    if (address.length())
-        return false;
+    bool ok;
 
-    data = data.remove('0');
-    data = data.remove('1');
-    if (data.length())
-        return false;
+    instruction = address.toInt(&ok, 2);
+    QString hexnum=QString::number(instruction,2);
+    instruction = hexnum.toInt(&ok,16);
 
-    return true;
+    if(ok) {
+        parameter = data.toInt(&ok, 2);
+        return VALID_FIELD;
+    }
+
+    return INVALID_FIELD;
 }
 
-bool Parser::validateHex(QString& line, int& instruction, int& parameter) {
+PARSE_STATE Parser::validateHex(QString& line, int& instruction, int& parameter) {
     // check whether there is a separator
     if (line.indexOf('_') == -1)
-        return false;
+        return INVALID_FIELD;
 
-    QString address = line.section('_',0,0);
-    QString data = line.section('_',1,1);
-
+    QStringList myStringList = line.split("_");
+    QString address = myStringList.at(0);
+    QString data = myStringList.at(1);
 
     if((address.length() != 4) || (data.length() != 6))
-        return false;
+        return INVALID_FIELD;
 
     // check whether the hex numbers are correctly formed
     bool ok;
-
-    int i = address.toUInt(&ok, 16);
-    if (!ok) {
-        return false;
+    instruction = address.toUInt(&ok, 16);
+    if (ok) {
+        parameter = data.toUInt(&ok, 16);
+        return VALID_FIELD;
     }
 
-    data.toUInt(&ok, 16);
-    if (!ok) {
-        return false;
-    }
-
-    return true;
+    return INVALID_FIELD;
 }
