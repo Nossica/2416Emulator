@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <parser.hpp>
 #include <instruction.hpp>
+#include <QStandardItemModel>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -11,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     fileName_.clear();
-    RAM_.fill(false, 32767);
+    //RAM_.fill(false, 32767);
 
     connect(ui->ALU, SIGNAL(textChanged()), this, SLOT(updateALU()));
     connect(ui->ACC, SIGNAL(textChanged()), this, SLOT(updateACC()));
@@ -49,12 +50,28 @@ void MainWindow::on_pushButton_clicked()
         }
         while (currentState != FILE_END);
 
+        QStandardItemModel* model = new QStandardItemModel(instructions_.size(), 2, this);
+        model->setHorizontalHeaderItem(0, new QStandardItem(QString("Instruction")));
+        model->setHorizontalHeaderItem(1, new QStandardItem(QString("Parameter")));
+//        model->setHorizontalHeaderItem(2, new QStandardItem(QString("Hex value")));
+        ui->theProgram->setModel(model);
+
+        for(int row = 0; row < instructions_.size(); row++) {
+            QStandardItem *firstCol = new QStandardItem(instructions_[row]->getName());
+            QStandardItem *secondCol = new QStandardItem(instructions_[row]->getParameter());
+
+            model->setItem(row,0,firstCol);
+            model->setItem(row,1,secondCol);
+        }
     }
 }
 
 void MainWindow::on_Run_clicked() {
     //for (auto it = )
-    registers_["ACC"] = 1;
+    //registers_["ACC"] = 1;
+    do {
+        instructions_[RAM_.current_]->execute();
+    } while(1);
 }
 
 void MainWindow::updateALU() {
@@ -74,7 +91,6 @@ void MainWindow::updateCarry() {
 }
 
 Instruction* MainWindow::factory(int index, int parameter) {
-    //return NULL;
     switch (index){
         default:
         return NULL;

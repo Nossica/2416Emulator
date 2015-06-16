@@ -6,6 +6,8 @@
 #include <QString>
 #include <QMap>
 
+#include <ram.h>
+
 class Instruction;
 
 namespace Ui {
@@ -35,7 +37,7 @@ private:
     QString fileName_;
 
     QList<QString> input_;
-    QVector<bool> RAM_;
+    RAM RAM_;
     QMap<QString, unsigned int> registers_;
     QMap<QString, bool> flags_;
     QMap<int, Instruction*> instructions_;

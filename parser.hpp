@@ -43,10 +43,7 @@ public:
         delete in_;
     }
 
-    //
-    void parse(QList<QString>& input);
     PARSE_STATE parse(int& instruction, int& parameter);
-
 };
 
 #endif // PARSER_HPP
