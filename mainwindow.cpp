@@ -14,10 +14,11 @@ MainWindow::MainWindow(QWidget *parent) :
     fileName_.clear();
     //RAM_.fill(false, 32767);
 
-    connect(ui->ALU, SIGNAL(textChanged()), this, SLOT(updateALU()));
-    connect(ui->ACC, SIGNAL(textChanged()), this, SLOT(updateACC()));
-    connect(ui->Carry, SIGNAL(textChanged()), this, SLOT(updateCarry()));
-    connect(ui->Zero, SIGNAL(textChanged()), this, SLOT(updateZero()));
+    registers_["ALU"] = 0;
+    registers_["ACC"] = 0;
+    flags_["ZERO"] = 0;
+    flags_["CARRY"] = 0;
+    updateGUI();
 }
 
 MainWindow::~MainWindow()
@@ -57,38 +58,35 @@ void MainWindow::on_pushButton_clicked()
         ui->theProgram->setModel(model);
 
         for(int row = 0; row < instructions_.size(); row++) {
-            QStandardItem *firstCol = new QStandardItem(instructions_[row]->getName());
-            QStandardItem *secondCol = new QStandardItem(instructions_[row]->getParameter());
+            QStandardItem *firstCol = new QStandardItem(row, 0, instructions_[row]->getName());
+            QStandardItem *secondCol = new QStandardItem(row, 1, instructions_[row]->getParameter());
 
             model->setItem(row,0,firstCol);
             model->setItem(row,1,secondCol);
         }
     }
+    updateGUI();
 }
 
 void MainWindow::on_Run_clicked() {
-    //for (auto it = )
-    //registers_["ACC"] = 1;
-    do {
-        instructions_[RAM_.current_]->execute();
-    } while(1);
+   // do {
+        if (instructions_[RAM_.current_] == NULL)
+            return;
+
+        if (instructions_[RAM_.current_]->execute())
+            ++RAM_.current_;
+        updateGUI();
+    //} while(1);
 }
 
-void MainWindow::updateALU() {
-    registers_["ALU"] = ui->ALU->toPlainText().toInt(0,16);
+void MainWindow::updateGUI() {
+    ui->ACC->setText(QString::number(registers_["ACC"]));
+    ui->ALU->setText(QString::number(registers_["ALU"]));
+    ui->Carry->setText(QString::number(flags_["CARRY"]));
+    ui->Zero->setText(QString::number(flags_["ZERO"]));
+    ui->theProgram->selectRow(RAM_.current_);
 }
 
-void MainWindow::updateACC() {
-    registers_["ACC"] = ui->ACC->toPlainText().toInt(0,16);
-}
-
-void MainWindow::updateZero() {
-    flags_["Zero"] = ui->ALU->toPlainText().toInt(0,2);
-}
-
-void MainWindow::updateCarry() {
-    flags_["Carry"] = ui->ALU->toPlainText().toInt(0,2);
-}
 
 Instruction* MainWindow::factory(int index, int parameter) {
     switch (index){

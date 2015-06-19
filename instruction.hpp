@@ -13,16 +13,16 @@ private:
     QString name_;
 protected:
     int parameter_;
-    QMap<QString, unsigned int> registers_;
-    QMap<QString, bool> flags_;
-    RAM RAM_;
+    QMap<QString, unsigned int>& registers_;
+    QMap<QString, bool>& flags_;
+    RAM& RAM_;
 
 public:
     Instruction(const QString& name, const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram);
 
     virtual bool execute(unsigned int input = 0) = 0;
-    virtual QString getName() {return name_;}
-    virtual QString getParameter() {return QString::number(parameter_);}
+    virtual QString getName() { return name_; }
+    virtual QString getParameter() { return QString::number(parameter_); }
 };
 
 class JMP : public Instruction {
@@ -35,7 +35,7 @@ public:
         // move the current instruction to the input value.
         // how do we relate the instruction line to the memory location.
         RAM_.current_ = parameter_;
-        return true;
+        return false;
     }
 };
 
@@ -348,6 +348,7 @@ public:
     {}
 
     virtual bool execute(unsigned int input = 0) {
+        registers_["ACC"]++;
         return true;
     }
 };
