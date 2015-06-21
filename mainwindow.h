@@ -6,6 +6,8 @@
 #include <QString>
 #include <QMap>
 
+#include <registers.h>
+#include <flags.h>
 #include <ram.h>
 
 class Instruction;
@@ -36,8 +38,8 @@ private:
 
     QList<QString> input_;
     RAM RAM_;
-    QMap<QString, unsigned int> registers_;
-    QMap<QString, bool> flags_;
+    Registers registers_;
+    Flags flags_;
     QMap<int, Instruction*> instructions_;
 
     Instruction* factory(int index, int parameter);

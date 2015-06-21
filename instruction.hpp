@@ -4,8 +4,9 @@
 #include<QString>
 #include<QMap>
 #include<QVector>
+#include<flags.h>
+#include<registers.h>
 #include<ram.h>
-
 
 class Instruction
 {
@@ -13,12 +14,12 @@ private:
     QString name_;
 protected:
     int parameter_;
-    QMap<QString, unsigned int>& registers_;
-    QMap<QString, bool>& flags_;
+    Registers& registers_;
+    Flags& flags_;
     RAM& RAM_;
 
 public:
-    Instruction(const QString& name, const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram);
+    Instruction(const QString& name, const int parameter, Registers& registers, Flags& flags, RAM& Ram);
 
     virtual bool execute(unsigned int input = 0) = 0;
     virtual QString getName() { return name_; }
@@ -27,99 +28,106 @@ public:
 
 class JMP : public Instruction {
 public:
-    JMP(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    JMP(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("JMP", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
-        RAM_.current_ = parameter_;
+        RAM_.setCurrent(parameter_);
         return false;
     }
 };
 
 class JPC : public Instruction {
 public:
-    JPC(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    JPC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("JPC", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+        if (flags_.getCarry()) {
+            RAM_.setCurrent(input);
+            return false;
+        }
         return true;
     }
 };
 
 class JPZ : public Instruction {
 public:
-    JPZ(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    JPZ(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("JPZ", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+        if (flags_.getZero()) {
+            RAM_.setCurrent(input);
+            return false;
+        }
         return true;
     }
 };
 
 class JNC : public Instruction {
 public:
-    JNC(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    JNC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("JNC", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+        if (flags_.getCarry() == false) {
+            RAM_.setCurrent(input);
+            return false;
+        }
         return true;
     }
 };
 
 class JNZ : public Instruction {
 public:
-    JNZ(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    JNZ(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("JNZ", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+        if (flags_.getZero() == false) {
+            RAM_.setCurrent(input);
+            return false;
+        }
         return true;
     }
 };
 
 class JPE : public Instruction {
 public:
-    JPE(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    JPE(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("JPE", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+        if (flags_.getCarry() || flags_.getZero()) {
+            RAM_.setCurrent(input);
+            return false;
+        }
         return true;
     }
 };
 
 class NOP : public Instruction {
 public:
-    NOP(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    NOP(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("NOP", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+        // WTF?
         return true;
     }
 };
 
 class DO : public Instruction {
 public:
-    DO(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    DO(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("DO", parameter, registers, flags, Ram)
     {}
 
@@ -133,47 +141,45 @@ public:
 // Decrement accumulator
 class DEC : public Instruction {
 public:
-    DEC(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    DEC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("DEC", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
         // check what happens if it has not been created yet?
         // in real terms, what happens if it is zero?
-        --registers_["ACC"];
+        registers_.subACC(1);
         return true;
     }
 };
 
 class SUC : public Instruction {
 public:
-    SUC(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    SUC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("SUC", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+        registers_.subACC(input - 1);
         return true;
     }
 };
 
 class ADD : public Instruction {
 public:
-    ADD(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    ADD(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("ADD", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+        registers_.addACC(input);
         return true;
     }
 };
 
 class ASL : public Instruction {
 public:
-    ASL(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    ASL(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("ASL", parameter, registers, flags, Ram)
     {}
 
@@ -186,7 +192,7 @@ public:
 
 class NOF : public Instruction {
 public:
-    NOF(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    NOF(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("NOF", parameter, registers, flags, Ram)
     {}
 
@@ -199,7 +205,7 @@ public:
 
 class INV : public Instruction {
 public:
-    INV(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    INV(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("INV", parameter, registers, flags, Ram)
     {}
 
@@ -212,7 +218,7 @@ public:
 
 class NAN : public Instruction {
 public:
-    NAN(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    NAN(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("NAN", parameter, registers, flags, Ram)
     {}
 
@@ -225,20 +231,19 @@ public:
 
 class SET : public Instruction {
 public:
-    SET(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    SET(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("SET", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+        registers_.setACC(input);
         return true;
     }
 };
 
 class LDC : public Instruction {
 public:
-    LDC(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    LDC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("LDC", parameter, registers, flags, Ram)
     {}
 
@@ -251,7 +256,7 @@ public:
 
 class XOR : public Instruction {
 public:
-    XOR(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    XOR(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("XOR", parameter, registers, flags, Ram)
     {}
 
@@ -265,19 +270,19 @@ public:
 // Load accumulator
 class LDA : public Instruction {
 public:
-    LDA(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    LDA(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("LDA", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
-        registers_["ACC"] = input;
+        Ram_[input]=registers_.getACC();
         return true;
     }
 };
 
 class IOR : public Instruction {
 public:
-    IOR(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    IOR(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("IOR", parameter, registers, flags, Ram)
     {}
 
@@ -288,7 +293,7 @@ public:
 
 class CLR : public Instruction {
 public:
-    CLR(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    CLR(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("CLR", parameter, registers, flags, Ram)
     {}
 
@@ -299,7 +304,7 @@ public:
 
 class AND : public Instruction {
 public:
-    AND(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    AND(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("AND", parameter, registers, flags, Ram)
     {}
 
@@ -310,7 +315,7 @@ public:
 
 class SUB : public Instruction {
 public:
-    SUB(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    SUB(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("SUB", parameter, registers, flags, Ram)
     {}
 
@@ -321,7 +326,7 @@ public:
 
 class ADI : public Instruction {
 public:
-    ADI(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    ADI(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("ADI", parameter, registers, flags, Ram)
     {}
 
@@ -332,7 +337,7 @@ public:
 
 class SFI : public Instruction {
 public:
-    SFI(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    SFI(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("SFI", parameter, registers, flags, Ram)
     {}
 
@@ -343,12 +348,12 @@ public:
 
 class INC : public Instruction {
 public:
-    INC(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    INC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("INC", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
-        registers_["ACC"]++;
+        registers_.addACC(1);
         return true;
     }
 };
@@ -356,14 +361,12 @@ public:
 // Store accumulator
 class STA : public Instruction {
 public:
-    STA(const int parameter, QMap<QString, unsigned int>& registers, QMap<QString, bool>& flags, RAM& Ram) :
+    STA(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
         Instruction("STA", parameter, registers, flags, Ram)
     {}
 
     virtual bool execute(unsigned int input = 0) {
-         // RAM[input] = registers_[ALU];
-        // want to do the above but it will not work - will need to convert the ACC into a binary sequence and write them
-        // on by one ... or something
+        RAM_[input] = registers_.getACC();
         return true;
     }
 };

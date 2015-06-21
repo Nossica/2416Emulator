@@ -6,9 +6,9 @@
 class RAM
 {
     std::map<unsigned int, unsigned int> memory_;
+    unsigned int current_;
 
 public:
-    unsigned int current_;
 
     RAM():current_(0) {
     }
@@ -25,9 +25,11 @@ public:
         return memory_[current_];
     }
 
-    void setNextMemory(const unsigned int location) {
+    void setCurrent(const unsigned int location) {
         current_ = location;
     }
+
+    unsigned int getCurrent() { return current_; }
 };
 
 #endif // RAM_H

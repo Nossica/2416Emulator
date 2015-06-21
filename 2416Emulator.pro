@@ -14,11 +14,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     parser.cpp \
     instruction.cpp \
-    ram.cpp
+    ram.cpp \
+    registers.cpp \
+    flags.cpp
 
 HEADERS  += mainwindow.h \
     parser.hpp \
     instruction.hpp \
-    ram.h
+    ram.h \
+    registers.h \
+    flags.h
 
 FORMS    += mainwindow.ui
