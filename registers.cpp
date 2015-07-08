@@ -1,9 +1,7 @@
 #include "registers.h"
 
-Registers::Registers()
+Registers::Registers():acc_("ACC"), ALU_ ("ALU"), RAR_("RAR")
 {
-    acc_ = "ACC";
-    ALU_ = "ALU";
     setALU(0);
     setACC(0);
 }

@@ -23,6 +23,7 @@ HEADERS  += mainwindow.h \
     instruction.hpp \
     ram.h \
     registers.h \
-    flags.h
+    flags.h \
+    constants.hpp
 
 FORMS    += mainwindow.ui

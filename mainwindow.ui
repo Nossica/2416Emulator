@@ -43,9 +43,9 @@
    <widget class="QTextEdit" name="ALU">
     <property name="geometry">
      <rect>
-      <x>550</x>
+      <x>430</x>
       <y>40</y>
-      <width>111</width>
+      <width>61</width>
       <height>31</height>
      </rect>
     </property>
@@ -53,7 +53,7 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>480</x>
+      <x>360</x>
       <y>50</y>
       <width>51</width>
       <height>17</height>
@@ -66,7 +66,7 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>480</x>
+      <x>360</x>
       <y>100</y>
       <width>51</width>
       <height>17</height>
@@ -79,8 +79,8 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>140</y>
+      <x>530</x>
+      <y>50</y>
       <width>51</width>
       <height>17</height>
      </rect>
@@ -92,8 +92,8 @@
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>190</y>
+      <x>530</x>
+      <y>100</y>
       <width>51</width>
       <height>17</height>
      </rect>
@@ -105,9 +105,9 @@
    <widget class="QTextEdit" name="ACC">
     <property name="geometry">
      <rect>
-      <x>550</x>
+      <x>430</x>
       <y>90</y>
-      <width>111</width>
+      <width>61</width>
       <height>31</height>
      </rect>
     </property>
@@ -115,9 +115,9 @@
    <widget class="QTextEdit" name="Carry">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>130</y>
-      <width>111</width>
+      <x>600</x>
+      <y>40</y>
+      <width>61</width>
       <height>31</height>
      </rect>
     </property>
@@ -125,9 +125,9 @@
    <widget class="QTextEdit" name="Zero">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>180</y>
-      <width>111</width>
+      <x>600</x>
+      <y>90</y>
+      <width>61</width>
       <height>31</height>
      </rect>
     </property>
@@ -137,7 +137,7 @@
      <rect>
       <x>20</x>
       <y>40</y>
-      <width>441</width>
+      <width>331</width>
       <height>421</height>
      </rect>
     </property>
@@ -146,6 +146,32 @@
     </property>
     <property name="showGrid">
      <bool>false</bool>
+    </property>
+    <attribute name="horizontalHeaderCascadingSectionResizes">
+     <bool>false</bool>
+    </attribute>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>10</y>
+      <width>51</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>RAR</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="RAR">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>0</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
     </property>
    </widget>
   </widget>

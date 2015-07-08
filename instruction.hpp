@@ -8,6 +8,8 @@
 #include<registers.h>
 #include<ram.h>
 
+// could we do bitwise and and or regardless of the base the number is in?
+
 class Instruction
 {
 private:
@@ -21,7 +23,7 @@ protected:
 public:
     Instruction(const QString& name, const int parameter, Registers& registers, Flags& flags, RAM& Ram);
 
-    virtual bool execute(unsigned int input = 0) = 0;
+    virtual bool execute() = 0;
     virtual QString getName() { return name_; }
     virtual QString getParameter() { return QString::number(parameter_); }
 };
@@ -32,7 +34,20 @@ public:
         Instruction("JMP", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
+    virtual bool execute() {
+        RAM_.setCurrent(parameter_);
+        return false;
+    }
+};
+
+class RJMP : public Instruction {
+public:
+    RJMP(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
+        Instruction("RJMP", parameter, registers, flags, Ram)
+    {}
+
+    virtual bool execute() {
+        RAM_.setRAR();
         RAM_.setCurrent(parameter_);
         return false;
     }
@@ -44,9 +59,25 @@ public:
         Instruction("JPC", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
+    virtual bool execute() {
         if (flags_.getCarry()) {
-            RAM_.setCurrent(input);
+            RAM_.setCurrent(parameter_);
+            return false;
+        }
+        return true;
+    }
+};
+
+class NJPC : public Instruction {
+public:
+    NJPC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
+        Instruction("JPC", parameter, registers, flags, Ram)
+    {}
+
+    virtual bool execute() {
+        if (flags_.getCarry()) {
+            RAM_.setRAR();
+            RAM_.setCurrent(parameter_);
             return false;
         }
         return true;
@@ -59,9 +90,25 @@ public:
         Instruction("JPZ", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
+    virtual bool execute() {
         if (flags_.getZero()) {
-            RAM_.setCurrent(input);
+            RAM_.setCurrent(parameter_);
+            return false;
+        }
+        return true;
+    }
+};
+
+class RJPZ : public Instruction {
+public:
+    RJPZ(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
+        Instruction("JPZ", parameter, registers, flags, Ram)
+    {}
+
+    virtual bool execute() {
+        if (flags_.getZero()) {
+            RAM_.setRAR();
+            RAM_.setCurrent(parameter_);
             return false;
         }
         return true;
@@ -74,9 +121,25 @@ public:
         Instruction("JNC", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
+    virtual bool execute() {
         if (flags_.getCarry() == false) {
-            RAM_.setCurrent(input);
+            RAM_.setCurrent(parameter_);
+            return false;
+        }
+        return true;
+    }
+};
+
+class RJNC : public Instruction {
+public:
+    RJNC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
+        Instruction("JNC", parameter, registers, flags, Ram)
+    {}
+
+    virtual bool execute() {
+        if (flags_.getCarry() == false) {
+            RAM_.setRAR();
+            RAM_.setCurrent(parameter_);
             return false;
         }
         return true;
@@ -89,9 +152,25 @@ public:
         Instruction("JNZ", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
+    virtual bool execute() {
         if (flags_.getZero() == false) {
-            RAM_.setCurrent(input);
+            RAM_.setCurrent(parameter_);
+            return false;
+        }
+        return true;
+    }
+};
+
+class RJNZ : public Instruction {
+public:
+    RJNZ(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
+        Instruction("JNZ", parameter, registers, flags, Ram)
+    {}
+
+    virtual bool execute() {
+        if (flags_.getZero() == false) {
+            RAM_.setRAR();
+            RAM_.setCurrent(parameter_);
             return false;
         }
         return true;
@@ -104,9 +183,25 @@ public:
         Instruction("JPE", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
+    virtual bool execute() {
         if (flags_.getCarry() || flags_.getZero()) {
-            RAM_.setCurrent(input);
+            RAM_.setCurrent(parameter_);
+            return false;
+        }
+        return true;
+    }
+};
+
+class RJPE : public Instruction {
+public:
+    RJPE(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
+        Instruction("JPE", parameter, registers, flags, Ram)
+    {}
+
+    virtual bool execute() {
+        if (flags_.getCarry() || flags_.getZero()) {
+            RAM_.setRAR();
+            RAM_.setCurrent(parameter_);
             return false;
         }
         return true;
@@ -119,8 +214,20 @@ public:
         Instruction("NOP", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        // WTF?
+    virtual bool execute() {
+        RAM_.setRAR();
+        return true;
+    }
+};
+
+class RNOP : public Instruction {
+public:
+    RNOP(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
+        Instruction("NOP", parameter, registers, flags, Ram)
+    {}
+
+    virtual bool execute() {
+        RAM_.setRAR();
         return true;
     }
 };
@@ -131,9 +238,8 @@ public:
         Instruction("DO", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+    virtual bool execute() {
+        RAM_.setRAR();
         return true;
     }
 };
@@ -145,10 +251,8 @@ public:
         Instruction("DEC", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        // check what happens if it has not been created yet?
-        // in real terms, what happens if it is zero?
-        registers_.subACC(1);
+    virtual bool execute() {
+        flags_.setFlags(registers_.subACC(1));
         return true;
     }
 };
@@ -159,8 +263,9 @@ public:
         Instruction("SUC", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        registers_.subACC(input - 1);
+    virtual bool execute() {
+        flags_.setFlags(registers_.subACC(RAM_.readFromMemory(parameter_)));
+        flags_.setFlags(registers_.subACC(1));
         return true;
     }
 };
@@ -171,8 +276,8 @@ public:
         Instruction("ADD", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        registers_.addACC(input);
+    virtual bool execute() {
+        flags_.setFlags(registers_.addACC(RAM_.readFromMemory(parameter_)));
         return true;
     }
 };
@@ -183,9 +288,8 @@ public:
         Instruction("ASL", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+    virtual bool execute() {
+        flags_.setFlags(registers_.shiftACCUp());
         return true;
     }
 };
@@ -196,9 +300,8 @@ public:
         Instruction("NOF", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+    virtual bool execute() {
+        //flags_.setFlags(registers_.getACC());
         return true;
     }
 };
@@ -209,9 +312,8 @@ public:
         Instruction("INV", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+    virtual bool execute() {
+        registers_.invACC();
         return true;
     }
 };
@@ -222,9 +324,13 @@ public:
         Instruction("NAN", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+    virtual bool execute() {
+        unsigned int i = registers_.getACC();
+        unsigned int j = RAM_.readFromMemory(parameter_);
+        unsigned int q = (i&j);
+        unsigned int z = ~q;
+
+        registers_.setACC((~(registers_.getACC() & RAM_.readFromMemory(parameter_)))%0xFFFF);
         return true;
     }
 };
@@ -235,8 +341,8 @@ public:
         Instruction("SET", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        registers_.setACC(input);
+    virtual bool execute() {
+        flags_.setFlags(registers_.setACC(parameter_));
         return true;
     }
 };
@@ -247,9 +353,8 @@ public:
         Instruction("LDC", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+    virtual bool execute() {
+        flags_.setFlags(registers_.setACC(~RAM_.readFromMemory(parameter_)));
         return true;
     }
 };
@@ -260,9 +365,8 @@ public:
         Instruction("XOR", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        // move the current instruction to the input value.
-        // how do we relate the instruction line to the memory location.
+    virtual bool execute() {
+        flags_.setFlags(registers_.setACC(registers_.getACC() ^ RAM_.readFromMemory(parameter_)));
         return true;
     }
 };
@@ -274,8 +378,8 @@ public:
         Instruction("LDA", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        Ram_[input]=registers_.getACC();
+    virtual bool execute() {
+        flags_.setFlags(registers_.setACC(RAM_.readFromMemory(parameter_)));
         return true;
     }
 };
@@ -286,7 +390,8 @@ public:
         Instruction("IOR", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
+    virtual bool execute() {
+        flags_.setFlags(registers_.setACC(registers_.getACC() | RAM_.readFromMemory(parameter_)));
         return true;
     }
 };
@@ -297,7 +402,8 @@ public:
         Instruction("CLR", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
+    virtual bool execute() {
+        flags_.setFlags(registers_.setACC(0));
         return true;
     }
 };
@@ -308,7 +414,8 @@ public:
         Instruction("AND", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
+    virtual bool execute() {
+        flags_.setFlags(registers_.setACC(registers_.getACC() & RAM_.readFromMemory(parameter_)));
         return true;
     }
 };
@@ -319,7 +426,8 @@ public:
         Instruction("SUB", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
+    virtual bool execute() {
+        flags_.setFlags(registers_.subACC(RAM_.readFromMemory(parameter_)));
         return true;
     }
 };
@@ -330,7 +438,8 @@ public:
         Instruction("ADI", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
+    virtual bool execute() {
+        flags_.setFlags(registers_.addACC(1 + RAM_.readFromMemory(parameter_)));
         return true;
     }
 };
@@ -341,7 +450,8 @@ public:
         Instruction("SFI", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
+    virtual bool execute() {
+        flags_.setFlags(registers_.shiftACCUp(0x1));
         return true;
     }
 };
@@ -352,8 +462,8 @@ public:
         Instruction("INC", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        registers_.addACC(1);
+    virtual bool execute() {
+        flags_.setFlags(registers_.addACC(1));
         return true;
     }
 };
@@ -365,11 +475,24 @@ public:
         Instruction("STA", parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute(unsigned int input = 0) {
-        RAM_[input] = registers_.getACC();
+    virtual bool execute() {
+        RAM_.writeToMemory(parameter_, registers_.getACC());
         return true;
     }
 };
 
+// Store accumulator
+class RSTA : public Instruction {
+public:
+    RSTA(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
+        Instruction("STA", parameter, registers, flags, Ram)
+    {}
+
+    virtual bool execute() {
+        RAM_.setRAR();
+        RAM_.writeToMemory(parameter_, registers_.getACC());
+        return true;
+    }
+};
 
 #endif // INSTRUCTION_HPP

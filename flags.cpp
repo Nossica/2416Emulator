@@ -2,6 +2,9 @@
 
 Flags::Flags()
 {
-    setZero(false);
+    zero_ = "ZERO";
+    carry_ = "CARRY";
+
+    setZero(true);
     setCarry(false);
 }
