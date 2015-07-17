@@ -39,6 +39,10 @@ void MainWindow::on_pushButton_clicked()
                 // we now have the instruction and parameter to create the object
                 Instruction* temp = factory(instruction, parameter);
                 if (temp) {
+                    //////////////////////
+                    // TODO
+                    // this needs to update the actual RAM rather than the instructions
+                    //////////////////////
                     instructions_[index] = temp;
                     ++index;
                 }
@@ -84,7 +88,6 @@ void MainWindow::updateGUI() {
     ui->RAR->setText(QString::number(RAM_.getRAR()));
     ui->theProgram->selectRow(RAM_.getCurrent());
 }
-
 
 Instruction* MainWindow::factory(int index, int parameter) {
     switch (index){

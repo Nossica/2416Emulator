@@ -8,7 +8,9 @@
 #include<registers.h>
 #include<ram.h>
 
-// could we do bitwise and and or regardless of the base the number is in?
+class Token {
+
+};
 
 class Instruction
 {
@@ -325,11 +327,6 @@ public:
     {}
 
     virtual bool execute() {
-        unsigned int i = registers_.getACC();
-        unsigned int j = RAM_.readFromMemory(parameter_);
-        unsigned int q = (i&j);
-        unsigned int z = ~q;
-
         registers_.setACC((~(registers_.getACC() & RAM_.readFromMemory(parameter_)))%0xFFFF);
         return true;
     }
