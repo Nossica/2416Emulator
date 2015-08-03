@@ -10,9 +10,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->theProgram->verticalHeader()->setVisible(false);
+    ui->theMemory->verticalHeader()->setVisible(false);
 
     fileName_.clear();
+
+    const unsigned int memoryMax = RAM_.memoryLimit();
+    memoryModel_ = new QStandardItemModel(memoryMax, 2, this);
+    memoryModel_->setHorizontalHeaderItem(0, new QStandardItem(QString("Index")));
+    memoryModel_->setHorizontalHeaderItem(1, new QStandardItem(QString("Instruction")));
+    memoryModel_->setHorizontalHeaderItem(2, new QStandardItem(QString("Parameter")));
+
+    ui->theMemory->setModel(memoryModel_);
+
     updateGUI();
 }
 
@@ -23,8 +32,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    fileName_ = QFileDialog::getOpenFileName(this,
-        tr("Open input file"), "", tr("2416E Files (*.vnp)"));
+    fileName_ = QFileDialog::getOpenFileName(this, tr("Open input file"), "", tr("2416E Files (*.vnp)"));
 
     if (fileName_.isEmpty() == false) {
         Parser theParser(fileName_);
@@ -39,44 +47,32 @@ void MainWindow::on_pushButton_clicked()
                 // we now have the instruction and parameter to create the object
                 Instruction* temp = factory(instruction, parameter);
                 if (temp) {
-                    //////////////////////
-                    // TODO
-                    // this needs to update the actual RAM rather than the instructions
-                    //////////////////////
-                    instructions_[index] = temp;
+                    RAM_.writeToMemory(index,temp);
                     ++index;
                 }
             }
         }
         while (currentState != FILE_END);
-
-        QStandardItemModel* model = new QStandardItemModel(instructions_.size(), 3, this);
-        model->setHorizontalHeaderItem(0, new QStandardItem(QString("Index")));
-        model->setHorizontalHeaderItem(1, new QStandardItem(QString("Instruction")));
-        model->setHorizontalHeaderItem(2, new QStandardItem(QString("Parameter")));
-        ui->theProgram->setModel(model);
-
-        for(int row = 0; row < instructions_.size(); row++) {
-            QStandardItem *firstCol = new QStandardItem(QString::number(row));
-            QStandardItem *secondCol = new QStandardItem(instructions_[row]->getName());
-            QStandardItem *thirdCol = new QStandardItem(instructions_[row]->getParameter());
-
-            model->setItem(row,0,firstCol);
-            model->setItem(row,1,secondCol);
-            model->setItem(row,2,thirdCol);
-        }
     }
     updateGUI();
 }
 
 void MainWindow::on_Run_clicked() {
    // do {
-        if (instructions_[RAM_.getCurrent()] == NULL)
+        Token* current = RAM_.readFromMemory(RAM_.getCurrent());
+        if (current == NULL)
             return;
+        try {
+            if (current->execute()) {
+                RAM_.setCurrent(RAM_.getCurrent()+1);
+            }
+            updateGUI();
+        }
+        catch (...) {
+            // this is not an instruction!!!
+            return;
+        }
 
-        if (instructions_[RAM_.getCurrent()]->execute())
-            RAM_.setCurrent(RAM_.getCurrent()+1);
-        updateGUI();
     //} while(1);
 }
 
@@ -85,8 +81,21 @@ void MainWindow::updateGUI() {
     ui->ALU->setText(QString::number(registers_.getALU()));
     ui->Carry->setText(QString::number(flags_.getCarry()));
     ui->Zero->setText(QString::number(flags_.getZero()));
-    ui->RAR->setText(QString::number(RAM_.getRAR()));
-    ui->theProgram->selectRow(RAM_.getCurrent());
+    ui->RAR->setText(QString::number(RAM_.getRAR()->getValue()));
+    ui->CurrentVal->setText(QString::number(RAM_.getCurrent()));
+
+    //ui->theMemory->selectRow(RAM_.getCurrent());
+
+    unsigned int memoryMax = RAM_.memoryLimit();
+    for (int row=0; row<=memoryMax; ++row){
+        QStandardItem *firstCol = new QStandardItem(QString::number(row));
+        QStandardItem *secondCol = new QStandardItem(QString::number(RAM_.readFromMemory(row)->getValue(), 16));
+        QStandardItem *thirdCol = new QStandardItem(QString::number(RAM_.readFromMemory(row)->getParameter(), 16));
+        memoryModel_->setItem(row,0,firstCol);
+        memoryModel_->setItem(row,1,secondCol);
+        memoryModel_->setItem(row,2,thirdCol);
+    }
+    ui->theMemory->selectRow(RAM_.getCurrent());
 }
 
 Instruction* MainWindow::factory(int index, int parameter) {

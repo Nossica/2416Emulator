@@ -16,7 +16,8 @@ SOURCES += main.cpp\
     instruction.cpp \
     ram.cpp \
     registers.cpp \
-    flags.cpp
+    flags.cpp \
+    token.cpp
 
 HEADERS  += mainwindow.h \
     parser.hpp \
@@ -24,6 +25,7 @@ HEADERS  += mainwindow.h \
     ram.h \
     registers.h \
     flags.h \
-    constants.hpp
+    constants.hpp \
+    token.h
 
 FORMS    += mainwindow.ui

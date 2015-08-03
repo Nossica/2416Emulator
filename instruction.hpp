@@ -7,25 +7,20 @@
 #include<flags.h>
 #include<registers.h>
 #include<ram.h>
+#include<token.h>
 
-class Token {
-
-};
-
-class Instruction
+class Instruction : public Token
 {
 private:
     QString name_;
 protected:
-    int parameter_;
     Registers& registers_;
     Flags& flags_;
     RAM& RAM_;
 
 public:
-    Instruction(const QString& name, const int parameter, Registers& registers, Flags& flags, RAM& Ram);
+    Instruction(const QString& name, const unsigned int value, const int parameter, Registers& registers, Flags& flags, RAM& Ram);
 
-    virtual bool execute() = 0;
     virtual QString getName() { return name_; }
     virtual QString getParameter() { return QString::number(parameter_); }
 };
@@ -33,10 +28,10 @@ public:
 class JMP : public Instruction {
 public:
     JMP(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("JMP", parameter, registers, flags, Ram)
+        Instruction("JMP", 0x00, parameter, registers, flags, Ram)
     {}
 
-    virtual bool execute() {
+    bool execute() {
         RAM_.setCurrent(parameter_);
         return false;
     }
@@ -45,7 +40,7 @@ public:
 class RJMP : public Instruction {
 public:
     RJMP(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("RJMP", parameter, registers, flags, Ram)
+        Instruction("RJMP", 0x30, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -58,7 +53,7 @@ public:
 class JPC : public Instruction {
 public:
     JPC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("JPC", parameter, registers, flags, Ram)
+        Instruction("JPC", 0x0B, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -73,7 +68,7 @@ public:
 class NJPC : public Instruction {
 public:
     NJPC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("JPC", parameter, registers, flags, Ram)
+        Instruction("JPC", 0x3B, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -89,7 +84,7 @@ public:
 class JPZ : public Instruction {
 public:
     JPZ(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("JPZ", parameter, registers, flags, Ram)
+        Instruction("JPZ", 0x0E, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -104,7 +99,7 @@ public:
 class RJPZ : public Instruction {
 public:
     RJPZ(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("JPZ", parameter, registers, flags, Ram)
+        Instruction("JPZ", 0x3E, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -120,7 +115,7 @@ public:
 class JNC : public Instruction {
 public:
     JNC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("JNC", parameter, registers, flags, Ram)
+        Instruction("JNC", 0x0D, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -135,7 +130,7 @@ public:
 class RJNC : public Instruction {
 public:
     RJNC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("JNC", parameter, registers, flags, Ram)
+        Instruction("JNC", 0x3D, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -151,7 +146,7 @@ public:
 class JNZ : public Instruction {
 public:
     JNZ(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("JNZ", parameter, registers, flags, Ram)
+        Instruction("JNZ", 0x07, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -166,7 +161,7 @@ public:
 class RJNZ : public Instruction {
 public:
     RJNZ(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("JNZ", parameter, registers, flags, Ram)
+        Instruction("JNZ", 0x37, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -182,7 +177,7 @@ public:
 class JPE : public Instruction {
 public:
     JPE(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("JPE", parameter, registers, flags, Ram)
+        Instruction("JPE", 0x0A, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -197,7 +192,7 @@ public:
 class RJPE : public Instruction {
 public:
     RJPE(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("JPE", parameter, registers, flags, Ram)
+        Instruction("JPE", 0x3A, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -213,7 +208,7 @@ public:
 class NOP : public Instruction {
 public:
     NOP(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("NOP", parameter, registers, flags, Ram)
+        Instruction("NOP", 0x0F, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -225,7 +220,7 @@ public:
 class RNOP : public Instruction {
 public:
     RNOP(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("NOP", parameter, registers, flags, Ram)
+        Instruction("NOP", 0x3F, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -237,7 +232,7 @@ public:
 class DO : public Instruction {
 public:
     DO(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("DO", parameter, registers, flags, Ram)
+        Instruction("DO", 0x3F, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -250,7 +245,7 @@ public:
 class DEC : public Instruction {
 public:
     DEC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("DEC", parameter, registers, flags, Ram)
+        Instruction("DEC", 0x40, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -262,11 +257,11 @@ public:
 class SUC : public Instruction {
 public:
     SUC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("SUC", parameter, registers, flags, Ram)
+        Instruction("SUC", 0x46, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
-        flags_.setFlags(registers_.subACC(RAM_.readFromMemory(parameter_)));
+        flags_.setFlags(registers_.subACC(RAM_.readFromMemory(parameter_)->getValue()));
         flags_.setFlags(registers_.subACC(1));
         return true;
     }
@@ -275,11 +270,11 @@ public:
 class ADD : public Instruction {
 public:
     ADD(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("ADD", parameter, registers, flags, Ram)
+        Instruction("ADD", 0x49, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
-        flags_.setFlags(registers_.addACC(RAM_.readFromMemory(parameter_)));
+        flags_.setFlags(registers_.addACC(RAM_.readFromMemory(parameter_)->getValue()));
         return true;
     }
 };
@@ -287,7 +282,7 @@ public:
 class ASL : public Instruction {
 public:
     ASL(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("ASL", parameter, registers, flags, Ram)
+        Instruction("ASL", 0x4C, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -299,7 +294,7 @@ public:
 class NOF : public Instruction {
 public:
     NOF(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("NOF", parameter, registers, flags, Ram)
+        Instruction("NOF", 0x4F, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -311,7 +306,7 @@ public:
 class INV : public Instruction {
 public:
     INV(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("INV", parameter, registers, flags, Ram)
+        Instruction("INV", 0x50, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -323,11 +318,11 @@ public:
 class NAN : public Instruction {
 public:
     NAN(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("NAN", parameter, registers, flags, Ram)
+        Instruction("NAN", 0x51, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
-        registers_.setACC((~(registers_.getACC() & RAM_.readFromMemory(parameter_)))%0xFFFF);
+        registers_.setACC((~(registers_.getACC() & RAM_.readFromMemory(parameter_)->getValue()))%0xFFFF);
         return true;
     }
 };
@@ -335,7 +330,7 @@ public:
 class SET : public Instruction {
 public:
     SET(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("SET", parameter, registers, flags, Ram)
+        Instruction("SET", 0x52, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -347,11 +342,11 @@ public:
 class LDC : public Instruction {
 public:
     LDC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("LDC", parameter, registers, flags, Ram)
+        Instruction("LDC", 0x54, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
-        flags_.setFlags(registers_.setACC(~RAM_.readFromMemory(parameter_)));
+        flags_.setFlags(registers_.setACC(~RAM_.readFromMemory(parameter_)->getValue()));
         return true;
     }
 };
@@ -359,11 +354,11 @@ public:
 class XOR : public Instruction {
 public:
     XOR(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("XOR", parameter, registers, flags, Ram)
+        Instruction("XOR", 0x59, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
-        flags_.setFlags(registers_.setACC(registers_.getACC() ^ RAM_.readFromMemory(parameter_)));
+        flags_.setFlags(registers_.setACC(registers_.getACC() ^ RAM_.readFromMemory(parameter_)->getValue()));
         return true;
     }
 };
@@ -372,11 +367,11 @@ public:
 class LDA : public Instruction {
 public:
     LDA(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("LDA", parameter, registers, flags, Ram)
+        Instruction("LDA", 0x5A, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
-        flags_.setFlags(registers_.setACC(RAM_.readFromMemory(parameter_)));
+        flags_.setFlags(registers_.setACC(RAM_.readFromMemory(parameter_)->getValue()));
         return true;
     }
 };
@@ -384,11 +379,11 @@ public:
 class IOR : public Instruction {
 public:
     IOR(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("IOR", parameter, registers, flags, Ram)
+        Instruction("IOR", 0x5B, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
-        flags_.setFlags(registers_.setACC(registers_.getACC() | RAM_.readFromMemory(parameter_)));
+        flags_.setFlags(registers_.setACC(registers_.getACC() | RAM_.readFromMemory(parameter_)->getValue()));
         return true;
     }
 };
@@ -396,7 +391,7 @@ public:
 class CLR : public Instruction {
 public:
     CLR(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("CLR", parameter, registers, flags, Ram)
+        Instruction("CLR", 0x5C, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -408,11 +403,11 @@ public:
 class AND : public Instruction {
 public:
     AND(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("AND", parameter, registers, flags, Ram)
+        Instruction("AND", 0x5E, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
-        flags_.setFlags(registers_.setACC(registers_.getACC() & RAM_.readFromMemory(parameter_)));
+        flags_.setFlags(registers_.setACC(registers_.getACC() & RAM_.readFromMemory(parameter_)->getValue()));
         return true;
     }
 };
@@ -420,11 +415,11 @@ public:
 class SUB : public Instruction {
 public:
     SUB(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("SUB", parameter, registers, flags, Ram)
+        Instruction("SUB", 0x66, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
-        flags_.setFlags(registers_.subACC(RAM_.readFromMemory(parameter_)));
+        flags_.setFlags(registers_.subACC(RAM_.readFromMemory(parameter_)->getValue()));
         return true;
     }
 };
@@ -432,11 +427,11 @@ public:
 class ADI : public Instruction {
 public:
     ADI(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("ADI", parameter, registers, flags, Ram)
+        Instruction("ADI", 0x69, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
-        flags_.setFlags(registers_.addACC(1 + RAM_.readFromMemory(parameter_)));
+        flags_.setFlags(registers_.addACC(1 + RAM_.readFromMemory(parameter_)->getValue()));
         return true;
     }
 };
@@ -444,7 +439,7 @@ public:
 class SFI : public Instruction {
 public:
     SFI(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("SFI", parameter, registers, flags, Ram)
+        Instruction("SFI", 0x6C, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -456,7 +451,7 @@ public:
 class INC : public Instruction {
 public:
     INC(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("INC", parameter, registers, flags, Ram)
+        Instruction("INC", 0x6F, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -469,7 +464,7 @@ public:
 class STA : public Instruction {
 public:
     STA(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("STA", parameter, registers, flags, Ram)
+        Instruction("STA", 0x80, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {
@@ -482,7 +477,7 @@ public:
 class RSTA : public Instruction {
 public:
     RSTA(const int parameter, Registers& registers, Flags& flags, RAM& Ram) :
-        Instruction("STA", parameter, registers, flags, Ram)
+        Instruction("STA", 0xB0, parameter, registers, flags, Ram)
     {}
 
     virtual bool execute() {

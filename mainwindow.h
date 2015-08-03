@@ -11,6 +11,7 @@
 #include <ram.h>
 
 class Instruction;
+class QStandardItemModel;
 
 namespace Ui {
 class MainWindow;
@@ -35,7 +36,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QString fileName_;
-
+    QStandardItemModel* memoryModel_;
     QList<QString> input_;
     RAM RAM_;
     Registers registers_;
