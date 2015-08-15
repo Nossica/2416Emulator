@@ -8,7 +8,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    logger_("emulatorLog.txt"),
+    logger_("Log/emulatorLog.txt"),
     logToFile_(false)
 {
     ui->setupUi(this);
@@ -199,4 +199,25 @@ Instruction* MainWindow::factory(int index, int parameter) {
 
 void MainWindow::on_logging_clicked(bool checked) {
     logToFile_ = checked;
+}
+
+void MainWindow::on_MemoryWrite_clicked()
+{
+    static int memoryLogIndex = 0;
+    QString fileName("Log/memoryLog");
+    fileName = fileName + QString::number(memoryLogIndex) + ".txt";
+
+    QFile memoryLogger(fileName);
+    memoryLogger.open(QIODevice::ReadWrite | QIODevice::Text);
+
+    QTextStream logStreamer(&memoryLogger);
+
+    unsigned int memoryMax = RAM_.memoryLimit();
+    for (int row=0; row<=memoryMax; ++row){
+        logStreamer << QString::number(RAM_.readFromMemory(row)->getValue(), 16);
+        logStreamer << '\t';
+        logStreamer << QString::number(RAM_.readFromMemory(row)->getParameter(), 16);
+        logStreamer << '\n';
+    }
+    ++memoryLogIndex;
 }

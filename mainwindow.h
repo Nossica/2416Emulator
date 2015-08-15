@@ -36,6 +36,8 @@ private slots:
 
     void on_logging_clicked(bool checked);
 
+    void on_MemoryWrite_clicked();
+
 private:
     Ui::MainWindow *ui;
     QString fileName_;

@@ -262,6 +262,19 @@
      <string>Log to file</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="MemoryWrite">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>0</y>
+      <width>97</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Log Memory</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
