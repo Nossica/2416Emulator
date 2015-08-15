@@ -52,6 +52,18 @@ public:
     void setCarry(const bool newVal) { flags_[carry_] = newVal; }
     bool getZero() const { return flags_[zero_]; }
     bool getCarry() const { return flags_[carry_]; }
+
+    QString outputToLog() {
+        QString logString;
+
+        logString.append("Carry: ");
+        logString.append(QString::number(getCarry(),2));
+        logString.append('\t');
+        logString.append("Zero: ");
+        logString.append(QString::number(getZero(),2));
+        logString.append('\t');
+        return logString;
+    }
 };
 
 #endif // FLAGS_H

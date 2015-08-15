@@ -1,6 +1,7 @@
 #ifndef INSTRUCTION_HPP
 #define INSTRUCTION_HPP
 
+#include<iostream>
 #include<QString>
 #include<QMap>
 #include<QVector>
@@ -22,7 +23,20 @@ public:
     Instruction(const QString& name, const unsigned int value, const int parameter, Registers& registers, Flags& flags, RAM& Ram);
 
     virtual QString getName() { return name_; }
-    virtual QString getParameter() { return QString::number(parameter_); }
+    virtual QString getParameter() { return QString::number(parameter_,16); }
+    virtual QString outputToLog() {
+        // Instruction name, value, param, RAR, ALU, ACC, Carry, Zero
+
+        QString logString;
+        logString.append("Name: ");
+        logString.append(getName());
+        logString.append("\t");
+        logString.append("Value: ");
+        logString.append(QString::number(getValue(), 16));
+        logString.append('\t');
+
+        return logString;
+    }
 };
 
 class JMP : public Instruction {

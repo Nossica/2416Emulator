@@ -7,7 +7,9 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    logger_("emulatorLog.txt"),
+    logToFile_(false)
 {
     ui->setupUi(this);
     ui->theMemory->verticalHeader()->setVisible(false);
@@ -21,13 +23,14 @@ MainWindow::MainWindow(QWidget *parent) :
     memoryModel_->setHorizontalHeaderItem(2, new QStandardItem(QString("Parameter")));
 
     ui->theMemory->setModel(memoryModel_);
-
+    logger_.open(QIODevice::ReadWrite | QIODevice::Text);
     updateGUI();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    logger_.close();
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -72,19 +75,39 @@ void MainWindow::on_Run_clicked() {
             // this is not an instruction!!!
             return;
         }
-
+        // Instruction name, value, param, RAR, ALU, ACC, Carry, Zero
+        if (logToFile_) {
+            QTextStream logStreamer(&logger_);
+            logStreamer << current->outputToLog();
+            logStreamer << registers_.outputToLog();
+            logStreamer << RAM_.outputToLog();
+            logStreamer << flags_.outputToLog();
+            logStreamer << '\n';
+        }
     //} while(1);
 }
 
 void MainWindow::updateGUI() {
+    // This function can be optimised to only update what has changed.
+    // At the moment it is fast enough so does not need it but it is worth baring in mind
+    Instruction* current = dynamic_cast<Instruction*>(RAM_.readFromMemory(RAM_.getCurrent()));
+
     ui->ACC->setText(QString::number(registers_.getACC()));
     ui->ALU->setText(QString::number(registers_.getALU()));
     ui->Carry->setText(QString::number(flags_.getCarry()));
     ui->Zero->setText(QString::number(flags_.getZero()));
     ui->RAR->setText(QString::number(RAM_.getRAR()->getValue()));
-    ui->CurrentVal->setText(QString::number(RAM_.getCurrent()));
 
-    //ui->theMemory->selectRow(RAM_.getCurrent());
+    if (current) {
+        ui->CurrentValue->setText(QString::number(current->getValue(),16));
+        ui->CurrentName->setText(current->getName());
+        ui->CurrentParam->setText(current->getParameter());
+    }
+    else {
+        ui->CurrentValue->setText("");
+        ui->CurrentName->setText("Error");
+        ui->CurrentParam->setText("");
+    }
 
     unsigned int memoryMax = RAM_.memoryLimit();
     for (int row=0; row<=memoryMax; ++row){
@@ -172,4 +195,8 @@ Instruction* MainWindow::factory(int index, int parameter) {
     case (0xB0):
         return new RSTA(parameter, registers_, flags_, RAM_);
     }
+}
+
+void MainWindow::on_logging_clicked(bool checked) {
+    logToFile_ = checked;
 }

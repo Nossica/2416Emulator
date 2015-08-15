@@ -5,6 +5,7 @@
 #include <QList>
 #include <QString>
 #include <QMap>
+#include <QFile>
 
 #include <registers.h>
 #include <flags.h>
@@ -33,6 +34,8 @@ private slots:
 
     void on_Run_clicked();
 
+    void on_logging_clicked(bool checked);
+
 private:
     Ui::MainWindow *ui;
     QString fileName_;
@@ -42,9 +45,9 @@ private:
     Registers registers_;
     Flags flags_;
     QMap<int, Instruction*> instructions_;
-
+    QFile logger_;
     Instruction* factory(int index, int parameter);
-
+    bool logToFile_;
     void updateGUI();
 };
 

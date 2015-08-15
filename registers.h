@@ -9,7 +9,6 @@ class Registers
 {
     QString acc_;
     QString ALU_;
-    QString RAR_;
     QMap<QString, unsigned int> registers_;
 public:
     Registers();
@@ -40,6 +39,18 @@ public:
 
     void setALU(unsigned int newValue) { registers_[ALU_] = newValue; }
     unsigned int getALU() { return registers_[ALU_]; }
+
+    QString outputToLog() {
+        QString logString;
+
+        logString.append("ALU: ");
+        logString.append(QString::number(getALU(),16));
+        logString.append('\t');
+        logString.append("ACC: ");
+        logString.append(QString::number(getACC(),16));
+        logString.append('\t');
+        return logString;
+    }
 };
 
 #endif // REGISTERS_H

@@ -69,5 +69,15 @@ public:
     unsigned int getCurrent() { return current_; }
     unsigned int getNext() { return ((getCurrent() + 1) % CAPACITY); }
     unsigned int memoryLimit() { return CAPACITY; }
+
+    QString outputToLog() {
+        QString logString;
+
+        logString.append("RAR: ");
+        logString.append(QString::number(getRAR()->getValue(), 16));
+        logString.append('\t');
+
+        return logString;
+    }
 };
 #endif // RAM_H

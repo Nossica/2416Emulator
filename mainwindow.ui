@@ -132,25 +132,12 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>10</y>
-      <width>51</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>RAR</string>
-    </property>
-   </widget>
    <widget class="QTextEdit" name="RAR">
     <property name="geometry">
      <rect>
-      <x>440</x>
-      <y>0</y>
-      <width>71</width>
+      <x>500</x>
+      <y>140</y>
+      <width>101</width>
       <height>31</height>
      </rect>
     </property>
@@ -180,27 +167,99 @@
      <bool>false</bool>
     </attribute>
    </widget>
-   <widget class="QTextEdit" name="CurrentVal">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>140</y>
-      <width>221</width>
-      <height>31</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>430</x>
       <y>150</y>
       <width>51</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Current</string>
+     <string>RAR</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_7">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>190</y>
+      <width>51</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Name</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="CurrentName">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>180</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="CurrentValue">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>220</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>230</y>
+      <width>51</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Value</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="CurrentParam">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>260</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_9">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>270</y>
+      <width>51</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Param</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="logging">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>0</y>
+      <width>97</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Log to file</string>
     </property>
    </widget>
   </widget>
