@@ -13,6 +13,7 @@
 
 class Instruction;
 class QStandardItemModel;
+class QTextStream;
 
 namespace Ui {
 class MainWindow;
@@ -26,17 +27,17 @@ signals:
     void ACCChanged(int newVal);
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(std::string parameter, QWidget *parent = 0);
     ~MainWindow();
     
 private slots:
-    void on_pushButton_clicked();
-
     void on_Run_clicked();
 
     void on_logging_clicked(bool checked);
 
     void on_MemoryWrite_clicked();
+
+    void on_LoadFile_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -50,7 +51,11 @@ private:
     QFile logger_;
     Instruction* factory(int index, int parameter);
     bool logToFile_;
+    bool testMode_;
     void updateGUI();
+    void runInBatchTestMode();
+    void outputToLog(QTextStream& destination, const Token* current);
+    bool processToken();
 };
 
 #endif // MAINWINDOW_H

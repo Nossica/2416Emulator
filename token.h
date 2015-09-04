@@ -32,13 +32,13 @@ public:
     virtual unsigned int getParameter() const { return parameter_; }
 
     // Instruction value, param
-    virtual QString outputToLog() {
+    virtual QString outputToLog() const {
         QString line;
         line.append("Value: ");
         line.append(QString::number(getValue(),16));
         line.append('\t');
         line.append("Parameter: ");
-        line.append(getParameter());
+        line.append(QString::number(getParameter(),16));
         line.append('\t');
         return line;
     }

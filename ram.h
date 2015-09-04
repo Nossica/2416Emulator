@@ -79,5 +79,16 @@ public:
 
         return logString;
     }
+
+    QString dumpRAMToLog() {
+        QString memoryDump;
+        for (int i=0; i <= 0xFFFF; i++) {
+            memoryDump += memory_[i]->outputToLog();
+            memoryDump += '\n';
+        }
+        return memoryDump;
+    }
+
+
 };
 #endif // RAM_H

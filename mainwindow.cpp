@@ -4,12 +4,16 @@
 #include <parser.hpp>
 #include <instruction.hpp>
 #include <QStandardItemModel>
+#include <QDirIterator>
+#include <QFileInfo>
+#include <QCryptographicHash>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(std::string parameter, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     logger_("Log/emulatorLog.txt"),
-    logToFile_(false)
+    logToFile_(false),
+    testMode_(false)
 {
     ui->setupUi(this);
     ui->theMemory->verticalHeader()->setVisible(false);
@@ -25,6 +29,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->theMemory->setModel(memoryModel_);
     logger_.open(QIODevice::ReadWrite | QIODevice::Text);
     updateGUI();
+
+    //if (parameter.compare("testmode"))
+        runInBatchTestMode();
 }
 
 MainWindow::~MainWindow()
@@ -33,7 +40,7 @@ MainWindow::~MainWindow()
     logger_.close();
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_LoadFile_clicked()
 {
     fileName_ = QFileDialog::getOpenFileName(this, tr("Open input file"), "", tr("2416E Files (*.vnp)"));
 
@@ -61,30 +68,8 @@ void MainWindow::on_pushButton_clicked()
 }
 
 void MainWindow::on_Run_clicked() {
-   // do {
-        Token* current = RAM_.readFromMemory(RAM_.getCurrent());
-        if (current == NULL)
-            return;
-        try {
-            if (current->execute()) {
-                RAM_.setCurrent(RAM_.getCurrent()+1);
-            }
-            updateGUI();
-        }
-        catch (...) {
-            // this is not an instruction!!!
-            return;
-        }
-        // Instruction name, value, param, RAR, ALU, ACC, Carry, Zero
-        if (logToFile_) {
-            QTextStream logStreamer(&logger_);
-            logStreamer << current->outputToLog();
-            logStreamer << registers_.outputToLog();
-            logStreamer << RAM_.outputToLog();
-            logStreamer << flags_.outputToLog();
-            logStreamer << '\n';
-        }
-    //} while(1);
+    if (processToken())
+        updateGUI();
 }
 
 void MainWindow::updateGUI() {
@@ -220,4 +205,132 @@ void MainWindow::on_MemoryWrite_clicked()
         logStreamer << '\n';
     }
     ++memoryLogIndex;
+}
+
+// Next step is to compare the newly created files to the master ones
+void MainWindow::runInBatchTestMode() {
+    QDir directory("test");
+    QStringList filter;
+    filter << "*.vnp";
+    QFileInfoList inputlist = directory.entryInfoList(filter, QDir::Files);
+
+    // Read each file in turn
+    for (QFileInfoList::iterator it = inputlist.begin(); it < inputlist.end(); ++it) {
+        QFileInfo file = *it;
+        QString baseName = file.baseName();
+
+        Parser theParser(file.filePath());
+        int index = 0;
+        PARSE_STATE currentState = VALID_FIELD;
+        do {
+            int instruction, parameter;
+            // need to set up an object per instruction
+            currentState = theParser.parse(instruction, parameter);
+
+            if (currentState == VALID_FIELD) {
+                // we now have the instruction and parameter to create the object
+                Instruction* temp = factory(instruction, parameter);
+                if (temp) {
+                    RAM_.writeToMemory(index,temp);
+                    ++index;
+                }
+            }
+        }
+        while (currentState != FILE_END);
+
+        QString output = "test/" + baseName + ".txt";
+        QFile outputFile(output);
+        outputFile.open(QIODevice::ReadWrite | QIODevice::Text);
+        QTextStream outputStreamer(&outputFile);
+        Token* current = NULL;
+
+        do {
+            if (processToken() && current) {
+                outputToLog(outputStreamer, current);
+            }
+        } while(current);
+
+        QString RAMoutput = "test/" + baseName + "RAM" + ".txt";
+        QFile RAMoutputFile(RAMoutput);
+        RAMoutputFile.open(QIODevice::ReadWrite | QIODevice::Text);
+        QTextStream RAMoutputStreamer(&RAMoutputFile);
+
+        RAMoutputStreamer << RAM_.dumpRAMToLog();
+        outputFile.close();
+        RAMoutputFile.close();
+
+        QString master = "test/" + baseName + "_master.txt";
+        QFile outputMasterFile(master);
+        if (false == outputMasterFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
+            // We are generating new master files
+            outputFile.rename(master);
+        }
+        else {
+            QCryptographicHash masterHash(QCryptographicHash::Sha1);
+            masterHash.addData(outputMasterFile.readAll());
+
+            QCryptographicHash testHash(QCryptographicHash::Sha1);
+            testHash.addData(outputFile.readAll());
+
+            // Retrieve the SHA1 signature of the file
+            QByteArray sigMaster = masterHash.result();
+            QByteArray sigTest = testHash.result();
+
+            if (sigMaster!=sigTest)
+                return;
+        }
+
+        QString masterRAM = "test/" + baseName + "RAM_master.txt";
+        QFile outputMasterRAMFile(masterRAM);
+        if (false == outputMasterRAMFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
+            // We are generating new master files
+            RAMoutputFile.rename(masterRAM);
+        }
+        else {
+            QCryptographicHash masterRAMHash(QCryptographicHash::Sha1);
+            masterRAMHash.addData(outputMasterFile.readAll());
+
+            QCryptographicHash testRAMHash(QCryptographicHash::Sha1);
+            testRAMHash.addData(RAMoutputFile.readAll());
+
+            // Retrieve the SHA1 signature of the file
+            QByteArray sigRAMMaster = masterRAMHash.result();
+            QByteArray sigRAMTest = testRAMHash.result();
+
+            if (sigRAMMaster!=sigRAMTest)
+                return;
+        }
+
+    }
+}
+
+bool MainWindow::processToken() {
+    Token* current = RAM_.readFromMemory(RAM_.getCurrent());
+    if (current == NULL)
+        return false;
+    try {
+        if (current->execute()) {
+            RAM_.setCurrent(RAM_.getCurrent()+1);
+
+            if (logToFile_) {
+                QTextStream logStreamer(&logger_);
+                outputToLog(logStreamer, current);
+            }
+
+            return true;
+        }
+    }
+    catch (...) {
+        // this is not an instruction!!!
+        return false;
+    }
+    return false;
+}
+
+void MainWindow::outputToLog(QTextStream& destination, const Token* current) {
+    destination << current->outputToLog();
+    destination << registers_.outputToLog();
+    destination << RAM_.outputToLog();
+    destination << flags_.outputToLog();
+    destination << '\n';
 }
