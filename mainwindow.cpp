@@ -30,8 +30,10 @@ MainWindow::MainWindow(std::string parameter, QWidget *parent) :
     logger_.open(QIODevice::ReadWrite | QIODevice::Text);
     updateGUI();
 
-    //if (parameter.compare("testmode"))
-        runInBatchTestMode();
+//    if (parameter.compare("testmode"))
+//        runInBatchTestMode();
+//    else if (parameter.compare("genRes"))
+//        generateTestResults();
 }
 
 MainWindow::~MainWindow()
@@ -261,7 +263,7 @@ void MainWindow::runInBatchTestMode() {
 
         QString master = "test/" + baseName + "_master.txt";
         QFile outputMasterFile(master);
-        if (false == outputMasterFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
+        if (false == outputMasterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
             // We are generating new master files
             outputFile.rename(master);
         }
@@ -276,7 +278,7 @@ void MainWindow::runInBatchTestMode() {
             QByteArray sigMaster = masterHash.result();
             QByteArray sigTest = testHash.result();
 
-            if (sigMaster!=sigTest)
+            if (sigMaster != sigTest)
                 return;
         }
 
@@ -297,7 +299,7 @@ void MainWindow::runInBatchTestMode() {
             QByteArray sigRAMMaster = masterRAMHash.result();
             QByteArray sigRAMTest = testRAMHash.result();
 
-            if (sigRAMMaster!=sigRAMTest)
+            if (sigRAMMaster != sigRAMTest)
                 return;
         }
 
